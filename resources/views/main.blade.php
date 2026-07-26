@@ -9,25 +9,25 @@
 </head>
 <body class="bg-white" style="scroll-behavior: smooth;">
     <!-- Navigation -->
-    <nav class="bg-green-800 text-white py-4 sticky top-0 z-50 shadow-lg">
+    <nav class="bg-white py-4 sticky top-0 z-50 shadow-lg border-b border-gray-200">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center">
                 <div class="text-2xl font-bold">
-                    <a href="/" class="flex items-center drop-shadow-sm">
+                    <a href="/" class="flex items-center focus:outline-none focus:ring-0 focus:bg-transparent">
                         <img src="/images/logo.png" alt="Bakso Pim" class="inline-block h-12 w-12 object-cover rounded-full mr-2 shadow-md">
-                        <span class="drop-shadow-sm">Bakso Pim</span>
+                        <span class="text-green-800" style="-webkit-text-stroke: 0.5px #166534; paint-order: stroke fill;">Bakso Pim</span>
                     </a>
                 </div>
                 <div class="hidden md:flex space-x-8">
-                    <a href="#" onclick="smoothScroll(event, 'top')" class="font-medium text-green-100 hover:text-white transition-all duration-150 drop-shadow-sm active:scale-95">Beranda</a>
-                    <a href="#BaksoPim" onclick="smoothScroll(event, 'BaksoPim')" class="font-medium text-green-100 hover:text-white transition-all duration-150 drop-shadow-sm active:scale-95">Menu</a>
-                    <a href="#about" onclick="smoothScroll(event, 'about')" class="font-medium text-green-100 hover:text-white transition-all duration-150 drop-shadow-sm active:scale-95">Tentang Kami</a>
-                    <a href="#contact" onclick="smoothScroll(event, 'contact')" class="font-medium text-green-100 hover:text-white transition-all duration-150 drop-shadow-sm active:scale-95">Kontak</a>
-                    <a href="/login" class="bg-white text-green-800 px-4 py-2 rounded-lg hover:bg-green-100 transition-all duration-150 font-semibold shadow-md active:scale-95">
+                    <a href="#" onclick="smoothScroll(event, 'top')" class="font-medium text-gray-700 hover:text-green-700 transition-all duration-150 active:scale-95">Beranda</a>
+                    <a href="#BaksoPim" onclick="smoothScroll(event, 'BaksoPim')" class="font-medium text-gray-700 hover:text-green-700 transition-all duration-150 active:scale-95">Menu</a>
+                    <a href="#about" onclick="smoothScroll(event, 'about')" class="font-medium text-gray-700 hover:text-green-700 transition-all duration-150 active:scale-95">Tentang Kami</a>
+                    <a href="#contact" onclick="smoothScroll(event, 'contact')" class="font-medium text-gray-700 hover:text-green-700 transition-all duration-150 active:scale-95">Kontak</a>
+                    <a href="/login" class="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 transition-all duration-150 font-semibold shadow-md active:scale-95">
                         <i class="fas fa-lock mr-1"></i>Masuk
                     </a>
                 </div>
-                <button class="md:hidden text-white active:scale-95 transition-transform duration-150">
+                <button class="md:hidden text-gray-700 active:scale-95 transition-transform duration-150">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
             </div>
@@ -111,85 +111,38 @@
 
             <!-- Makanan -->
             <div id="menu-makanan" class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-150 active:scale-[1.02] cursor-pointer">
-                    <div class="h-48 bg-green-100 flex items-center justify-center">
-                        <i class="fas fa-dumbbell text-5xl text-green-600"></i>
+                @forelse ($makanan as $item)
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-150 active:scale-[1.02] cursor-pointer">
+                        <div class="h-48 bg-green-100 flex items-center justify-center">
+                            <i class="fas fa-utensils text-5xl text-green-600"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">{{ $item->name }}</h3>
+                            <p class="text-gray-600 mb-4">{{ $item->description ?? 'Menu spesial dari Bakso Pim' }}</p>
+                            <div class="text-2xl font-bold text-green-600">Rp {{ number_format($item->price, 0, ',', '.') }}</div>
+                        </div>
                     </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Bakso Urat</h3>
-                        <p class="text-gray-600 mb-4">Bakso dengan ukuran sedang, sempurna untuk semua kalangan</p>
-                        <div class="text-2xl font-bold text-green-600">Rp 20,000</div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-150 active:scale-[1.02] cursor-pointer">
-                    <div class="h-48 bg-green-100 flex items-center justify-center">
-                        <i class="fas fa-dumbbell text-5xl text-green-600"></i>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Bakso Besar</h3>
-                        <p class="text-gray-600 mb-4">Bakso Super untuk pecinta bakso sejati, ukuran besar lebih puas</p>
-                        <div class="text-2xl font-bold text-green-600">Rp 25,000</div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-150 active:scale-[1.02] cursor-pointer">
-                    <div class="h-48 bg-green-100 flex items-center justify-center">
-                        <i class="fas fa-dumbbell text-5xl text-green-600"></i>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Bakso Spesial</h3>
-                        <p class="text-gray-600 mb-4">Paket spesial dengan tambahan Bakso Super dan Urat serta topping lengkap</p>
-                        <div class="text-2xl font-bold text-green-600">Rp 30,000</div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-150 active:scale-[1.02] cursor-pointer">
-                    <div class="h-48 bg-green-100 flex items-center justify-center">
-                        <i class="fas fa-dumbbell text-5xl text-green-600"></i>
-                    </div>
-                </div>
+                @empty
+                    <p class="text-gray-500 col-span-4 text-center py-8">Belum ada menu makanan tersedia.</p>
+                @endforelse
             </div>
 
             <!-- Minuman -->
             <div id="menu-minuman" class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 hidden">
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-150 active:scale-[1.02] cursor-pointer">
-                    <div class="h-48 bg-amber-100 flex items-center justify-center">
-                        <i class="fas fa-mug-hot text-5xl text-amber-600"></i>
+                @forelse ($minuman as $item)
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-150 active:scale-[1.02] cursor-pointer">
+                        <div class="h-48 bg-amber-100 flex items-center justify-center">
+                            <i class="fas fa-mug-hot text-5xl text-amber-600"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">{{ $item->name }}</h3>
+                            <p class="text-gray-600 mb-4">{{ $item->description ?? 'Minuman segar dari Bakso Pim' }}</p>
+                            <div class="text-2xl font-bold text-green-600">Rp {{ number_format($item->price, 0, ',', '.') }}</div>
+                        </div>
                     </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Es Teh Manis</h3>
-                        <p class="text-gray-600 mb-4">Teh manis segar dengan es batu, pelepas dahaga</p>
-                        <div class="text-2xl font-bold text-green-600">Rp 5,000</div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-150 active:scale-[1.02] cursor-pointer">
-                    <div class="h-48 bg-amber-100 flex items-center justify-center">
-                        <i class="fas fa-glass-whiskey text-5xl text-amber-600"></i>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Es Jeruk</h3>
-                        <p class="text-gray-600 mb-4">Perasan jeruk segar asli, nikmat dan kaya vitamin</p>
-                        <div class="text-2xl font-bold text-green-600">Rp 7,000</div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-150 active:scale-[1.02] cursor-pointer">
-                    <div class="h-48 bg-amber-100 flex items-center justify-center">
-                        <i class="fas fa-coffee text-5xl text-amber-600"></i>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Kopi Hitam</h3>
-                        <p class="text-gray-600 mb-4">Kopi pilihan dengan rasa kuat dan aroma khas</p>
-                        <div class="text-2xl font-bold text-green-600">Rp 8,000</div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-150 active:scale-[1.02] cursor-pointer">
-                    <div class="h-48 bg-amber-100 flex items-center justify-center">
-                        <i class="fas fa-tint text-5xl text-amber-600"></i>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Air Mineral</h3>
-                        <p class="text-gray-600 mb-4">Air mineral murni dari sumber mata air pegunungan</p>
-                        <div class="text-2xl font-bold text-green-600">Rp 3,000</div>
-                    </div>
-                </div>
+                @empty
+                    <p class="text-gray-500 col-span-4 text-center py-8">Belum ada menu minuman tersedia.</p>
+                @endforelse
             </div>
         </div>
     </section>

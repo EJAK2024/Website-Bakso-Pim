@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Menu;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,7 +42,13 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        return view('admin.index');
+        $totalMakanan = Menu::where('category', 'makanan')->count();
+        $totalMinuman = Menu::where('category', 'minuman')->count();
+        $totalMenu = Menu::count();
+        $pendingOrders = Order::where('status', 'pending')->count();
+        $unreadOrders = Order::where('is_read', false)->count();
+
+        return view('admin.index', compact('totalMakanan', 'totalMinuman', 'totalMenu', 'pendingOrders', 'unreadOrders'));
     }
 
     public function registerForm()
@@ -53,12 +61,16 @@ class AdminController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
+            'phone' => 'nullable|string|max:20',
+            'status' => 'required|in:admin,kasir,staff',
             'password' => 'required|min:6|confirmed',
         ]);
 
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'status' => $validated['status'],
             'password' => bcrypt($validated['password']),
         ]);
 

@@ -29,20 +29,37 @@
             <h1 class="text-4xl font-bold text-center text-green-700 mb-2">Form Pemesanan</h1>
             <p class="text-gray-500 text-center mb-10">Isi data diri dan pilih menu favorit Anda</p>
 
-            <form class="bg-white rounded-xl shadow-lg p-8">
+            @if (session('success'))
+                <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                    <p class="text-green-700">{{ session('success') }}</p>
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    @foreach ($errors->all() as $error)
+                        <p class="text-red-600 text-sm flex items-center"><i class="fas fa-exclamation-circle mr-2"></i>{{ $error }}</p>
+                    @endforeach
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('order.submit') }}" class="bg-white rounded-xl shadow-lg p-8">
+                @csrf
+
                 <div class="mb-6">
-                    <label for="nama" class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="nama" placeholder="Masukkan nama Anda" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
+                    <label for="customer_name" class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap</label>
+                    <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name') }}" placeholder="Masukkan nama Anda" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
                 </div>
 
                 <div class="mb-6">
-                    <label for="no_hp" class="block text-sm font-semibold text-gray-700 mb-1">No. HP / Telepon</label>
-                    <input type="tel" id="no_hp" placeholder="Contoh: 0812-3456-7890" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
+                    <label for="phone" class="block text-sm font-semibold text-gray-700 mb-1">No. HP / Telepon</label>
+                    <input type="tel" name="phone" id="phone" value="{{ old('phone') }}" placeholder="Contoh: 0812-3456-7890" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
                 </div>
 
                 <div class="mb-6">
-                    <label for="alamat" class="block text-sm font-semibold text-gray-700 mb-1">Alamat Pengiriman</label>
-                    <textarea id="alamat" rows="3" placeholder="Masukkan alamat lengkap" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"></textarea>
+                    <label for="address" class="block text-sm font-semibold text-gray-700 mb-1">Alamat Pengiriman</label>
+                    <textarea name="address" id="address" rows="3" placeholder="Masukkan alamat lengkap" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">{{ old('address') }}</textarea>
                 </div>
 
                 <div class="mb-6">
@@ -52,75 +69,38 @@
                         <button type="button" onclick="showFormCategory('minuman')" id="form-tab-minuman" class="px-6 py-2 rounded-lg font-semibold transition-all duration-150 bg-gray-200 text-gray-700 hover:bg-gray-300 active:scale-95">Minuman</button>
                     </div>
                     <div id="form-menu-makanan" class="grid md:grid-cols-2 gap-3">
-                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]">
-                            <input type="checkbox" class="w-5 h-5 text-green-600 rounded border-gray-300 mr-3">
-                            <div>
-                                <span class="font-semibold text-gray-800">Bakso Biasa</span>
-                                <span class="text-green-600 font-bold ml-2">Rp 15,000</span>
-                            </div>
-                        </label>
-                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]">
-                            <input type="checkbox" class="w-5 h-5 text-green-600 rounded border-gray-300 mr-3">
-                            <div>
-                                <span class="font-semibold text-gray-800">Bakso Besar</span>
-                                <span class="text-green-600 font-bold ml-2">Rp 25,000</span>
-                            </div>
-                        </label>
-                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]">
-                            <input type="checkbox" class="w-5 h-5 text-green-600 rounded border-gray-300 mr-3">
-                            <div>
-                                <span class="font-semibold text-gray-800">Bakso Spesial</span>
-                                <span class="text-green-600 font-bold ml-2">Rp 35,000</span>
-                            </div>
-                        </label>
-                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]">
-                            <input type="checkbox" class="w-5 h-5 text-green-600 rounded border-gray-300 mr-3">
-                            <div>
-                                <span class="font-semibold text-gray-800">Paket Keluarga</span>
-                                <span class="text-green-600 font-bold ml-2">Rp 100,000</span>
-                            </div>
-                        </label>
+                        @forelse ($makanan as $item)
+                            <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]">
+                                <input type="checkbox" name="menu_ids[]" value="{{ $item->id }}" class="w-5 h-5 text-green-600 rounded border-gray-300 mr-3" onchange="toggleQty(this)">
+                                <div class="flex-1">
+                                    <span class="font-semibold text-gray-800">{{ $item->name }}</span>
+                                    <span class="text-green-600 font-bold ml-2">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
+                                </div>
+                                <input type="number" name="quantities[]" min="1" value="1" class="w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm hidden qty-input focus:outline-none focus:ring-1 focus:ring-green-500">
+                            </label>
+                        @empty
+                            <p class="text-gray-500 col-span-2">Belum ada menu makanan tersedia.</p>
+                        @endforelse
                     </div>
                     <div id="form-menu-minuman" class="grid md:grid-cols-2 gap-3 hidden">
-                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]">
-                            <input type="checkbox" class="w-5 h-5 text-green-600 rounded border-gray-300 mr-3">
-                            <div>
-                                <span class="font-semibold text-gray-800">Es Teh Manis</span>
-                                <span class="text-green-600 font-bold ml-2">Rp 5,000</span>
-                            </div>
-                        </label>
-                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]">
-                            <input type="checkbox" class="w-5 h-5 text-green-600 rounded border-gray-300 mr-3">
-                            <div>
-                                <span class="font-semibold text-gray-800">Es Jeruk</span>
-                                <span class="text-green-600 font-bold ml-2">Rp 7,000</span>
-                            </div>
-                        </label>
-                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]">
-                            <input type="checkbox" class="w-5 h-5 text-green-600 rounded border-gray-300 mr-3">
-                            <div>
-                                <span class="font-semibold text-gray-800">Kopi Hitam</span>
-                                <span class="text-green-600 font-bold ml-2">Rp 8,000</span>
-                            </div>
-                        </label>
-                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]">
-                            <input type="checkbox" class="w-5 h-5 text-green-600 rounded border-gray-300 mr-3">
-                            <div>
-                                <span class="font-semibold text-gray-800">Air Mineral</span>
-                                <span class="text-green-600 font-bold ml-2">Rp 3,000</span>
-                            </div>
-                        </label>
+                        @forelse ($minuman as $item)
+                            <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]">
+                                <input type="checkbox" name="menu_ids[]" value="{{ $item->id }}" class="w-5 h-5 text-green-600 rounded border-gray-300 mr-3" onchange="toggleQty(this)">
+                                <div class="flex-1">
+                                    <span class="font-semibold text-gray-800">{{ $item->name }}</span>
+                                    <span class="text-green-600 font-bold ml-2">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
+                                </div>
+                                <input type="number" name="quantities[]" min="1" value="1" class="w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm hidden qty-input focus:outline-none focus:ring-1 focus:ring-green-500">
+                            </label>
+                        @empty
+                            <p class="text-gray-500 col-span-2">Belum ada menu minuman tersedia.</p>
+                        @endforelse
                     </div>
-                </div>
-
-                <div class="mb-6">
-                    <label for="jumlah" class="block text-sm font-semibold text-gray-700 mb-1">Jumlah Porsi</label>
-                    <input type="number" id="jumlah" min="1" value="1" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
                 </div>
 
                 <div class="mb-8">
-                    <label for="catatan" class="block text-sm font-semibold text-gray-700 mb-1">Catatan (opsional)</label>
-                    <textarea id="catatan" rows="2" placeholder="Contoh: tidak pakai micin, level pedas 3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"></textarea>
+                    <label for="notes" class="block text-sm font-semibold text-gray-700 mb-1">Catatan (opsional)</label>
+                    <textarea name="notes" id="notes" rows="2" placeholder="Contoh: tidak pakai micin, level pedas 3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">{{ old('notes') }}</textarea>
                 </div>
 
                 <button type="submit" class="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition-all duration-150 active:scale-95 shadow-lg">
@@ -152,6 +132,16 @@
                 makanan.classList.add('hidden');
                 tabMinuman.className = 'px-6 py-2 rounded-lg font-semibold transition-all duration-150 bg-green-600 text-white shadow active:scale-95';
                 tabMakanan.className = 'px-6 py-2 rounded-lg font-semibold transition-all duration-150 bg-gray-200 text-gray-700 hover:bg-gray-300 active:scale-95';
+            }
+        }
+
+        function toggleQty(checkbox) {
+            const qtyInput = checkbox.closest('label').querySelector('.qty-input');
+            if (checkbox.checked) {
+                qtyInput.classList.remove('hidden');
+            } else {
+                qtyInput.classList.add('hidden');
+                qtyInput.value = 1;
             }
         }
     </script>

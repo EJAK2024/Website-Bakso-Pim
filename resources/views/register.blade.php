@@ -53,8 +53,22 @@
                 </div>
 
                 <div class="mb-5">
+                    <label for="phone" class="block text-sm font-semibold text-gray-700 mb-1">No. HP (opsional)</label>
+                    <input type="tel" name="phone" id="phone" value="{{ old('phone') }}" placeholder="Contoh: 0812-3456-7890" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
+                </div>
+
+                <div class="mb-5">
                     <label for="email" class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
                     <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="admin@baksopim.com" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
+                </div>
+
+                <div class="mb-5">
+                    <label for="status" class="block text-sm font-semibold text-gray-700 mb-1">Status</label>
+                    <select name="status" id="status" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
+                        <option value="admin" {{ old('status') === 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="kasir" {{ old('status') === 'kasir' ? 'selected' : '' }}>Kasir</option>
+                        <option value="staff" {{ old('status') === 'staff' ? 'selected' : '' }}>Staff</option>
+                    </select>
                 </div>
 
                 <div class="mb-5">
