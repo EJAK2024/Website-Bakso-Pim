@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Menu - Bakso Pim</title>
+    <title>Pesan Masuk - Bakso Pim</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -64,71 +64,75 @@
         </div>
     </nav>
 
-    <section class="flex-1 py-10">
-        <div class="container mx-auto px-4 max-w-lg">
-            <h1 class="text-3xl font-bold text-green-700 mb-2">Edit Menu</h1>
-            <p class="text-gray-500 mb-8">Perbarui data menu "{{ $menu->name }}"</p>
+    <section class="flex-1 py-6 sm:py-10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-green-700">Pesan Masuk</h1>
+                    <p class="text-gray-500 text-sm sm:text-base">Pesan dari pengunjung website</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    @if($unreadCount > 0)
+                        <span class="bg-red-500 text-white text-xs sm:text-sm font-bold px-3 py-1 rounded-full animate-pulse">
+                            {{ $unreadCount }} baru
+                        </span>
+                        <a href="{{ route('messages.readAll') }}" class="bg-gray-500 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-gray-600 transition-all duration-150 active:scale-95">
+                            <i class="fas fa-check-double mr-1"></i>Tandai Sudah Dibaca
+                        </a>
+                    @endif
+                </div>
+            </div>
 
-            @if ($errors->any())
-                <div class="mb-5 p-4 bg-red-50 border border-red-200 rounded-lg">
-                    @foreach ($errors->all() as $error)
-                        <p class="text-red-600 text-sm flex items-center"><i class="fas fa-exclamation-circle mr-2"></i>{{ $error }}</p>
-                    @endforeach
+            @if (session('success'))
+                <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                    <p class="text-green-700">{{ session('success') }}</p>
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('menu.update', $menu) }}" enctype="multipart/form-data" class="bg-white rounded-xl shadow-lg p-5 sm:p-8">
-                @csrf
-                @method('PUT')
-
-                <div class="mb-5">
-                    <label for="name" class="block text-sm font-semibold text-gray-700 mb-1">Nama Menu</label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $menu->name) }}" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
-                </div>
-
-                <div class="mb-5">
-                    <label for="category" class="block text-sm font-semibold text-gray-700 mb-1">Kategori</label>
-                    <select name="category" id="category" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
-                        <option value="makanan" {{ old('category', $menu->category) === 'makanan' ? 'selected' : '' }}>Makanan</option>
-                        <option value="minuman" {{ old('category', $menu->category) === 'minuman' ? 'selected' : '' }}>Minuman</option>
-                    </select>
-                </div>
-
-                <div class="mb-5">
-                    <label for="description" class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi (opsional)</label>
-                    <textarea name="description" id="description" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">{{ old('description', $menu->description) }}</textarea>
-                </div>
-
-                <div class="mb-5">
-                    <label for="price" class="block text-sm font-semibold text-gray-700 mb-1">Harga (Rp)</label>
-                    <input type="number" name="price" id="price" value="{{ old('price', $menu->price) }}" min="0" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
-                </div>
-
-                <div class="mb-5">
-                    <label for="image" class="block text-sm font-semibold text-gray-700 mb-1">Gambar (opsional)</label>
-                    @if($menu->image)
-                        <div id="preview-edit" class="mb-3">
-                            <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}" class="w-32 h-32 object-cover rounded-lg shadow">
+            <div class="space-y-4">
+                @forelse ($messages as $msg)
+                    <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 {{ !$msg->is_read ? 'border-l-4 border-red-500 bg-red-50/30' : '' }}">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="text-base sm:text-lg font-bold text-gray-800 truncate">{{ $msg->name }}</h3>
+                                    @if(!$msg->is_read)
+                                        <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">BARU</span>
+                                    @endif
+                                </div>
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm text-gray-600">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-envelope mr-2 text-green-600"></i>{{ $msg->email }}
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-clock mr-2 text-green-600"></i>{{ $msg->created_at->format('d M Y, H:i') }}
+                                    </div>
+                                </div>
+                                <p class="mt-2 text-sm text-gray-500 line-clamp-2">{{ Str::limit($msg->message, 120) }}</p>
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <a href="{{ route('messages.show', $msg) }}" class="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition-all duration-150 active:scale-95">
+                                    <i class="fas fa-eye mr-1"></i>Lihat
+                                </a>
+                                <form method="POST" action="{{ route('messages.destroy', $msg) }}" onsubmit="return confirm('Yakin ingin menghapus pesan ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="bg-red-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-600 transition-all duration-150 active:scale-95">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                    @else
-                        <div id="preview-edit" class="mb-3 hidden">
-                            <img src="" alt="Preview" class="w-32 h-32 object-cover rounded-lg shadow">
-                        </div>
-                    @endif
-                    <input type="file" name="image" id="image" accept="image/*" onchange="previewImage(this, 'preview-edit')" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-green-50 file:text-green-700 file:font-semibold hover:file:bg-green-100">
-                </div>
-
-                <div class="mb-6">
-                    <label class="flex items-center cursor-pointer">
-                        <input type="checkbox" name="is_available" value="1" {{ old('is_available', $menu->is_available) ? 'checked' : '' }} class="w-5 h-5 text-green-600 rounded border-gray-300 mr-3">
-                        <span class="text-sm font-semibold text-gray-700">Tersedia (Stok ada)</span>
-                    </label>
-                </div>
-
-                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-blue-700 transition-all duration-150 active:scale-95 shadow-lg">
-                    <i class="fas fa-save mr-2"></i>Perbarui Menu
-                </button>
-            </form>
+                    </div>
+                @empty
+                    <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                        <i class="fas fa-envelope-open-text text-5xl text-gray-300 mb-4 block"></i>
+                        <p class="text-gray-500 text-lg">Belum ada pesan masuk</p>
+                        <p class="text-gray-400 text-sm mt-1">Pesan dari pengunjung akan muncul di sini</p>
+                    </div>
+                @endforelse
+            </div>
         </div>
     </section>
 
@@ -138,19 +142,6 @@
         </div>
     </footer>
     <script>
-        function previewImage(input, previewId) {
-            const preview = document.getElementById(previewId);
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.querySelector('img').src = e.target.result;
-                    preview.classList.remove('hidden');
-                };
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                preview.classList.add('hidden');
-            }
-        }
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             const icon = document.getElementById('hamburgerIcon');

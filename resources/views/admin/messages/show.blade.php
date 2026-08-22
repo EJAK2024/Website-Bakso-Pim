@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Menu - Bakso Pim</title>
+    <title>Pesan dari {{ $message->name }} - Bakso Pim</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -64,71 +64,48 @@
         </div>
     </nav>
 
-    <section class="flex-1 py-10">
-        <div class="container mx-auto px-4 max-w-lg">
-            <h1 class="text-3xl font-bold text-green-700 mb-2">Edit Menu</h1>
-            <p class="text-gray-500 mb-8">Perbarui data menu "{{ $menu->name }}"</p>
+    <section class="flex-1 py-6 sm:py-10">
+        <div class="container mx-auto px-4 max-w-2xl">
+            <h1 class="text-2xl sm:text-3xl font-bold text-green-700 mb-2">Detail Pesan</h1>
+            <p class="text-gray-500 mb-6 sm:mb-8">{{ $message->created_at->format('d M Y, H:i') }}</p>
 
-            @if ($errors->any())
-                <div class="mb-5 p-4 bg-red-50 border border-red-200 rounded-lg">
-                    @foreach ($errors->all() as $error)
-                        <p class="text-red-600 text-sm flex items-center"><i class="fas fa-exclamation-circle mr-2"></i>{{ $error }}</p>
-                    @endforeach
+            <div class="bg-white rounded-xl shadow-lg p-5 sm:p-6 mb-6">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">Informasi Pengirim</h2>
+                <div class="space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+                        <span class="text-sm text-gray-500 sm:w-24 flex-shrink-0">Nama</span>
+                        <span class="font-semibold text-gray-800">{{ $message->name }}</span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+                        <span class="text-sm text-gray-500 sm:w-24 flex-shrink-0">Email</span>
+                        <span class="font-semibold text-gray-800">{{ $message->email }}</span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+                        <span class="text-sm text-gray-500 sm:w-24 flex-shrink-0">Waktu</span>
+                        <span class="font-semibold text-gray-800">{{ $message->created_at->format('d M Y, H:i') }}</span>
+                    </div>
                 </div>
-            @endif
+            </div>
 
-            <form method="POST" action="{{ route('menu.update', $menu) }}" enctype="multipart/form-data" class="bg-white rounded-xl shadow-lg p-5 sm:p-8">
-                @csrf
-                @method('PUT')
-
-                <div class="mb-5">
-                    <label for="name" class="block text-sm font-semibold text-gray-700 mb-1">Nama Menu</label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $menu->name) }}" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
+            <div class="bg-white rounded-xl shadow-lg p-5 sm:p-6">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">Isi Pesan</h2>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-gray-700 whitespace-pre-wrap leading-relaxed">{{ $message->message }}</p>
                 </div>
+            </div>
 
-                <div class="mb-5">
-                    <label for="category" class="block text-sm font-semibold text-gray-700 mb-1">Kategori</label>
-                    <select name="category" id="category" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
-                        <option value="makanan" {{ old('category', $menu->category) === 'makanan' ? 'selected' : '' }}>Makanan</option>
-                        <option value="minuman" {{ old('category', $menu->category) === 'minuman' ? 'selected' : '' }}>Minuman</option>
-                    </select>
-                </div>
-
-                <div class="mb-5">
-                    <label for="description" class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi (opsional)</label>
-                    <textarea name="description" id="description" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">{{ old('description', $menu->description) }}</textarea>
-                </div>
-
-                <div class="mb-5">
-                    <label for="price" class="block text-sm font-semibold text-gray-700 mb-1">Harga (Rp)</label>
-                    <input type="number" name="price" id="price" value="{{ old('price', $menu->price) }}" min="0" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
-                </div>
-
-                <div class="mb-5">
-                    <label for="image" class="block text-sm font-semibold text-gray-700 mb-1">Gambar (opsional)</label>
-                    @if($menu->image)
-                        <div id="preview-edit" class="mb-3">
-                            <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}" class="w-32 h-32 object-cover rounded-lg shadow">
-                        </div>
-                    @else
-                        <div id="preview-edit" class="mb-3 hidden">
-                            <img src="" alt="Preview" class="w-32 h-32 object-cover rounded-lg shadow">
-                        </div>
-                    @endif
-                    <input type="file" name="image" id="image" accept="image/*" onchange="previewImage(this, 'preview-edit')" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-green-50 file:text-green-700 file:font-semibold hover:file:bg-green-100">
-                </div>
-
-                <div class="mb-6">
-                    <label class="flex items-center cursor-pointer">
-                        <input type="checkbox" name="is_available" value="1" {{ old('is_available', $menu->is_available) ? 'checked' : '' }} class="w-5 h-5 text-green-600 rounded border-gray-300 mr-3">
-                        <span class="text-sm font-semibold text-gray-700">Tersedia (Stok ada)</span>
-                    </label>
-                </div>
-
-                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-blue-700 transition-all duration-150 active:scale-95 shadow-lg">
-                    <i class="fas fa-save mr-2"></i>Perbarui Menu
-                </button>
-            </form>
+            <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                <a href="mailto:{{ $message->email }}" class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-all duration-150 active:scale-95 text-center">
+                    <i class="fas fa-reply mr-2"></i>Balas via Email
+                </a>
+                <form method="POST" action="{{ route('messages.destroy', $message) }}" onsubmit="return confirm('Yakin ingin menghapus pesan ini?')" class="flex-1">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="w-full bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition-all duration-150 active:scale-95">
+                        <i class="fas fa-trash mr-2"></i>Hapus Pesan
+                    </button>
+                </form>
+            </div>
         </div>
     </section>
 
@@ -138,19 +115,6 @@
         </div>
     </footer>
     <script>
-        function previewImage(input, previewId) {
-            const preview = document.getElementById(previewId);
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.querySelector('img').src = e.target.result;
-                    preview.classList.remove('hidden');
-                };
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                preview.classList.add('hidden');
-            }
-        }
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             const icon = document.getElementById('hamburgerIcon');

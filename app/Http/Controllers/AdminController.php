@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
+use App\Models\Message;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -47,8 +48,15 @@ class AdminController extends Controller
         $totalMenu = Menu::count();
         $pendingOrders = Order::where('status', 'pending')->count();
         $unreadOrders = Order::where('is_read', false)->count();
+        $unreadMessages = Message::where('is_read', false)->count();
 
-        return view('admin.index', compact('totalMakanan', 'totalMinuman', 'totalMenu', 'pendingOrders', 'unreadOrders'));
+        return view('admin.index', compact('totalMakanan', 'totalMinuman', 'totalMenu', 'pendingOrders', 'unreadOrders', 'unreadMessages'));
+    }
+
+    public function qrcode()
+    {
+        $url = url('/');
+        return view('admin.qrcode', compact('url'));
     }
 
     public function registerForm()

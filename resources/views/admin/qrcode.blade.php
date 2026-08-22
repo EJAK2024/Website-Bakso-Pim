@@ -3,9 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Pesanan #{{ $order->daily_order_number }} - Bakso Pim</title>
+    <title>QR Code Meja - Bakso Pim</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            #qr-print-area, #qr-print-area * { visibility: visible; }
+            #qr-print-area { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
     <nav class="bg-white py-4 sticky top-0 z-50 shadow-lg border-b border-gray-200">
@@ -22,7 +29,7 @@
                     <a href="/#BaksoPim" class="font-medium text-gray-700 hover:text-green-700 transition-all duration-150 active:scale-95">Menu</a>
                     <a href="/#contact" class="font-medium text-gray-700 hover:text-green-700 transition-all duration-150 active:scale-95">Kontak</a>
                     <a href="/#about" class="font-medium text-gray-700 hover:text-green-700 transition-all duration-150 active:scale-95">Tentang Kami</a>
-                    <a href="/admin" class="font-medium text-green-700 border-b-2 border-green-700 transition-all duration-150 active:scale-95">
+                    <a href="/admin" class="font-medium text-gray-700 hover:text-green-700 transition-all duration-150 active:scale-95">
                         <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
                     </a>
                     <div class="flex items-center gap-3 border-l border-gray-300 pl-4">
@@ -47,7 +54,7 @@
                 <a href="/#contact" class="block font-medium text-gray-700 hover:text-green-700 hover:bg-green-50 px-4 py-3 rounded-lg transition-all duration-150">Kontak</a>
                 <a href="/#about" class="block font-medium text-gray-700 hover:text-green-700 hover:bg-green-50 px-4 py-3 rounded-lg transition-all duration-150">Tentang Kami</a>
                 <div class="border-t border-gray-200 mt-2 pt-2">
-                    <a href="/admin" class="block font-medium text-green-700 bg-green-50 px-4 py-3 rounded-lg transition-all duration-150">
+                    <a href="/admin" class="block font-medium text-gray-700 hover:text-green-700 hover:bg-green-50 px-4 py-3 rounded-lg transition-all duration-150">
                         <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
                     </a>
                     <div class="px-4 py-2 text-sm text-gray-500">
@@ -64,86 +71,62 @@
         </div>
     </nav>
 
-    <section class="flex-1 py-10">
-        <div class="container mx-auto px-4 max-w-2xl">
-            <h1 class="text-3xl font-bold text-green-700 mb-2">Detail Pesanan #{{ $order->daily_order_number }}</h1>
-            <p class="text-gray-500 mb-8">{{ $order->created_at->format('d M Y, H:i') }}</p>
-
-            @if (session('success'))
-                <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
-                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                    <p class="text-green-700">{{ session('success') }}</p>
-                </div>
-            @endif
-
-            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-                <h2 class="text-lg font-bold text-gray-800 mb-4">Informasi Pelanggan</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-sm text-gray-500">Nama</p>
-                        <p class="font-semibold text-gray-800">{{ $order->customer_name }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">No. HP</p>
-                        <p class="font-semibold text-gray-800">{{ $order->phone }}</p>
-                    </div>
-                    <div class="col-span-2">
-                        <p class="text-sm text-gray-500">Alamat</p>
-                        <p class="font-semibold text-gray-800">{{ $order->address }}</p>
-                    </div>
-                    @if($order->notes)
-                        <div class="col-span-2">
-                            <p class="text-sm text-gray-500">Catatan</p>
-                            <p class="font-semibold text-gray-800 bg-yellow-50 p-2 rounded">{{ $order->notes }}</p>
-                        </div>
-                    @endif
-                </div>
+    <section class="flex-1 py-6 sm:py-10">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center gap-3 mb-2">
+                <a href="/admin" class="text-gray-400 hover:text-green-600 transition-colors">
+                    <i class="fas fa-arrow-left text-lg"></i>
+                </a>
+                <h1 class="text-2xl sm:text-3xl font-bold text-green-700">QR Code Meja</h1>
             </div>
+            <p class="text-gray-500 mb-6 sm:mb-8 ml-8">Generate QR code untuk akses cepat pelanggan ke website.</p>
 
-            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-                <h2 class="text-lg font-bold text-gray-800 mb-4">Item Pesanan</h2>
-                <div class="space-y-3">
-                    @foreach ($order->items as $item)
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <div>
-                                <span class="font-semibold text-gray-800">{{ $item->menu->name ?? 'Menu dihapus' }}</span>
-                                <span class="text-gray-500 ml-2">x{{ $item->quantity }}</span>
-                            </div>
-                            <div class="font-bold text-green-600">Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</div>
+            <div class="flex justify-center">
+                <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-10 w-full max-w-md border border-gray-100">
+                    <div class="text-center mb-6">
+                        <div class="inline-flex items-center justify-center w-14 h-14 bg-green-100 rounded-full mb-4">
+                            <i class="fas fa-qrcode text-2xl text-green-600"></i>
                         </div>
-                    @endforeach
-                </div>
-                <div class="border-t border-gray-200 mt-4 pt-4 flex justify-between items-center">
-                    <span class="text-lg font-bold text-gray-800">Total</span>
-                    <span class="text-2xl font-bold text-green-600">Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
-                </div>
-            </div>
+                        <h2 class="text-xl font-bold text-gray-800">Scan untuk Mengakses</h2>
+                        <p class="text-sm text-gray-500 mt-1">Bakso Pim - Website Pemesanan</p>
+                    </div>
 
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-lg font-bold text-gray-800 mb-4">Ubah Status</h2>
-                <form method="POST" action="{{ route('orders.updateStatus', $order) }}">
-                    @csrf
-                    @method('PUT')
-                    <div class="flex items-center gap-4">
-                        <select name="status" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
-                            @php
-                                $statuses = [
-                                    'pending' => 'Menunggu',
-                                    'diproses' => 'Diproses',
-                                    'dikirim' => 'Dikirim',
-                                    'selesai' => 'Selesai',
-                                    'dibatalkan' => 'Dibatalkan',
-                                ];
-                            @endphp
-                            @foreach ($statuses as $value => $label)
-                                <option value="{{ $value }}" {{ $order->status === $value ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-all duration-150 active:scale-95">
-                            <i class="fas fa-save mr-2"></i>Update
+                    <div id="qr-print-area" class="flex justify-center mb-6">
+                        <div class="bg-white p-4 rounded-xl border-2 border-gray-100 shadow-inner">
+                            <img
+                                src="https://api.qrserver.com/v1/create-qr-code/size=400x400/?data={{ urlencode($url) }}"
+                                alt="QR Code Bakso Pim"
+                                class="w-64 h-64 sm:w-72 sm:h-72 object-contain"
+                                id="qrImage"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-6">
+                        <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Website URL</p>
+                        <p class="text-sm text-green-700 font-mono bg-green-50 px-4 py-2 rounded-lg break-all">{{ $url }}</p>
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+                        <i class="fas fa-info-circle text-amber-500 mt-0.5 flex-shrink-0"></i>
+                        <p class="text-sm text-amber-700">Taruh QR ini di meja agar pelanggan bisa langsung mengakses website untuk melihat menu dan melakukan pemesanan.</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button
+                            onclick="downloadQR()"
+                            class="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition-all duration-150 active:scale-[1.02] shadow-md"
+                        >
+                            <i class="fas fa-download"></i> Download QR
+                        </button>
+                        <button
+                            onclick="printQR()"
+                            class="flex-1 flex items-center justify-center gap-2 bg-white text-green-700 font-semibold py-3 px-6 rounded-lg border-2 border-green-600 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]"
+                        >
+                            <i class="fas fa-print"></i> Cetak QR
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </section>
@@ -153,6 +136,7 @@
             <p>&copy; 2026 Bakso Pim. Panel administrasi.</p>
         </div>
     </footer>
+
     <script>
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
@@ -163,6 +147,20 @@
             } else {
                 icon.className = 'fas fa-times text-xl';
             }
+        }
+
+        function downloadQR() {
+            const link = document.createElement('a');
+            link.href = 'https://api.qrserver.com/v1/create-qr-code/size=400x400/?data={{ urlencode($url) }}';
+            link.download = 'QR-Code-Bakso-Pim.png';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function printQR() {
+            window.print();
         }
     </script>
 </body>

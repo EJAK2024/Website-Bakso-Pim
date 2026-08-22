@@ -25,11 +25,17 @@ class MenuController extends Controller
             'category' => 'required|in:makanan,minuman',
             'description' => 'nullable|string',
             'price' => 'required|integer|min:0',
-            'image' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_available' => 'boolean',
         ]);
 
         $validated['is_available'] = $request->boolean('is_available');
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('menu', 'public');
+        } else {
+            unset($validated['image']);
+        }
 
         Menu::create($validated);
 
@@ -48,11 +54,20 @@ class MenuController extends Controller
             'category' => 'required|in:makanan,minuman',
             'description' => 'nullable|string',
             'price' => 'required|integer|min:0',
-            'image' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_available' => 'boolean',
         ]);
 
         $validated['is_available'] = $request->boolean('is_available');
+
+        if ($request->hasFile('image')) {
+            if ($menu->image && \Storage::disk('public')->exists($menu->image)) {
+                \Storage::disk('public')->delete($menu->image);
+            }
+            $validated['image'] = $request->file('image')->store('menu', 'public');
+        } else {
+            unset($validated['image']);
+        }
 
         $menu->update($validated);
 
@@ -61,6 +76,9 @@ class MenuController extends Controller
 
     public function destroy(Menu $menu)
     {
+        if ($menu->image && \Storage::disk('public')->exists($menu->image)) {
+            \Storage::disk('public')->delete($menu->image);
+        }
         $menu->delete();
         return redirect('/admin/menu')->with('success', 'Menu berhasil dihapus.');
     }

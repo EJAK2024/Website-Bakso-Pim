@@ -16,6 +16,7 @@ class Order extends Model
         'notes',
         'total_price',
         'status',
+        'payment_method',
         'is_read',
     ];
 
@@ -32,5 +33,23 @@ class Order extends Model
     public function getTotalAttribute()
     {
         return $this->items->sum(fn($item) => $item->price * $item->quantity);
+    }
+
+    public function getDailyOrderNumberAttribute(): int
+    {
+        return self::whereDate('created_at', $this->created_at->toDateString())
+            ->where('id', '<=', $this->id)
+            ->count();
+    }
+
+    public static function isOperationalHours(): bool
+    {
+        $hour = now()->hour;
+        return $hour >= 10 && $hour < 23;
+    }
+
+    public static function getTodayOrderCount(): int
+    {
+        return self::whereDate('created_at', now()->toDateString())->count();
     }
 }

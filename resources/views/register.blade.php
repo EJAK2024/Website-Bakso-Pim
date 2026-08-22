@@ -8,17 +8,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
-    <nav class="bg-green-800 text-white py-4 shadow-lg">
+    <nav class="bg-white py-4 sticky top-0 z-50 shadow-lg border-b border-gray-200">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center">
-                <div class="text-2xl font-bold">
-                    <a href="/admin" class="flex items-center drop-shadow-sm">
-                        <img src="/images/logo.png" alt="Bakso Pim" class="inline-block h-12 w-12 object-cover rounded-full mr-2 shadow-md">
-                        <span class="drop-shadow-sm">Admin</span>
+                <div class="text-xl sm:text-2xl font-bold">
+                    <a href="/" class="flex items-center focus:outline-none focus:ring-0 focus:bg-transparent">
+                        <img src="/images/logo.png" alt="Bakso Pim" class="inline-block h-10 w-10 sm:h-12 sm:w-12 object-cover rounded-full mr-2 shadow-md">
+                        <span class="text-green-800" style="-webkit-text-stroke: 0.5px #166534; paint-order: stroke fill;">Bakso Pim</span>
                     </a>
                 </div>
-                <a href="/admin" class="font-medium text-green-100 hover:text-white transition-all duration-150 drop-shadow-sm active:scale-95">
-                    <i class="fas fa-arrow-left mr-1"></i>Dashboard
+                <a href="/" class="font-medium text-gray-700 hover:text-green-700 transition-all duration-150 active:scale-95">
+                    <i class="fas fa-arrow-left mr-1"></i>Kembali
                 </a>
             </div>
         </div>

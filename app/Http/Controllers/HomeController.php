@@ -27,6 +27,10 @@ class HomeController extends Controller
 
     public function submitOrder(Request $request)
     {
+        if (!Order::isOperationalHours()) {
+            return redirect()->route('pesan')->withErrors(['order' => 'Toko sedang tutup. Jam operasional: 10:00 - 23:00 WIB.']);
+        }
+
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
@@ -36,6 +40,7 @@ class HomeController extends Controller
             'quantities' => 'required|array|min:1',
             'quantities.*' => 'integer|min:1',
             'notes' => 'nullable|string',
+            'payment_method' => 'required|in:qris,kasir',
         ]);
 
         $order = Order::create([
@@ -44,6 +49,7 @@ class HomeController extends Controller
             'address' => $validated['address'],
             'notes' => $validated['notes'] ?? null,
             'status' => 'pending',
+            'payment_method' => $validated['payment_method'],
         ]);
 
         $totalPrice = 0;
@@ -64,6 +70,22 @@ class HomeController extends Controller
 
         $order->update(['total_price' => $totalPrice]);
 
-        return redirect('/pesan')->with('success', 'Pesanan berhasil dikirim! Nomor pesanan Anda: #' . $order->id);
+        if ($validated['payment_method'] === 'qris') {
+            return redirect()->route('order.qris', $order->id);
+        }
+
+        return redirect()->route('order.struk', $order->id);
+    }
+
+    public function qris($id)
+    {
+        $order = Order::with('items.menu')->findOrFail($id);
+        return view('qris', compact('order'));
+    }
+
+    public function struk($id)
+    {
+        $order = Order::with('items.menu')->findOrFail($id);
+        return view('struk', compact('order'));
     }
 }
