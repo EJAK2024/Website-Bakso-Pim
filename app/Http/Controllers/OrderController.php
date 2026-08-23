@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::with('items.menu')->latest()->get();
+        $orders = Order::with('items.menu')->latest()->paginate(20);
         $unreadCount = Order::where('is_read', false)->count();
 
         return view('admin.orders.index', compact('orders', 'unreadCount'));
@@ -29,7 +30,15 @@ class OrderController extends Controller
             'status' => 'required|in:pending,diproses,dikirim,selesai,dibatalkan',
         ]);
 
+        $oldStatus = $order->status;
         $order->update($validated);
+
+        Log::channel('activity')->info('Order status updated', [
+            'user' => auth()->user()->email ?? 'unknown',
+            'order_id' => $order->id,
+            'old_status' => $oldStatus,
+            'new_status' => $validated['status'],
+        ]);
 
         return back()->with('success', 'Status pesanan berhasil diperbarui.');
     }

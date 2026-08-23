@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MenuController extends Controller
 {
     public function index()
     {
-        $menus = Menu::all();
+        $menus = Menu::paginate(20);
         return view('admin.menu.index', compact('menus'));
     }
 
@@ -23,13 +24,17 @@ class MenuController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required|in:makanan,minuman',
-            'description' => 'nullable|string',
-            'price' => 'required|integer|min:0',
+            'description' => 'nullable|string|max:1000',
+            'price' => 'required|integer|min:0|max:10000000',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_available' => 'boolean',
         ]);
 
         $validated['is_available'] = $request->boolean('is_available');
+        $validated['name'] = e($validated['name']);
+        if (isset($validated['description'])) {
+            $validated['description'] = e($validated['description']);
+        }
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('menu', 'public');
@@ -38,6 +43,11 @@ class MenuController extends Controller
         }
 
         Menu::create($validated);
+
+        Log::channel('activity')->info('Menu created', [
+            'user' => auth()->user()->email ?? 'unknown',
+            'menu_name' => $validated['name'],
+        ]);
 
         return redirect('/admin/menu')->with('success', 'Menu berhasil ditambahkan.');
     }
@@ -52,13 +62,17 @@ class MenuController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required|in:makanan,minuman',
-            'description' => 'nullable|string',
-            'price' => 'required|integer|min:0',
+            'description' => 'nullable|string|max:1000',
+            'price' => 'required|integer|min:0|max:10000000',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_available' => 'boolean',
         ]);
 
         $validated['is_available'] = $request->boolean('is_available');
+        $validated['name'] = e($validated['name']);
+        if (isset($validated['description'])) {
+            $validated['description'] = e($validated['description']);
+        }
 
         if ($request->hasFile('image')) {
             if ($menu->image && \Storage::disk('public')->exists($menu->image)) {
@@ -71,11 +85,21 @@ class MenuController extends Controller
 
         $menu->update($validated);
 
+        Log::channel('activity')->info('Menu updated', [
+            'user' => auth()->user()->email ?? 'unknown',
+            'menu_id' => $menu->id,
+        ]);
+
         return redirect('/admin/menu')->with('success', 'Menu berhasil diperbarui.');
     }
 
     public function destroy(Menu $menu)
     {
+        Log::channel('activity')->info('Menu deleted', [
+            'user' => auth()->user()->email ?? 'unknown',
+            'menu_name' => $menu->name,
+        ]);
+
         if ($menu->image && \Storage::disk('public')->exists($menu->image)) {
             \Storage::disk('public')->delete($menu->image);
         }

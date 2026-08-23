@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MessageController extends Controller
 {
     public function index()
     {
-        $messages = Message::latest()->get();
+        $messages = Message::latest()->paginate(20);
         $unreadCount = Message::where('is_read', false)->count();
 
         return view('admin.messages.index', compact('messages', 'unreadCount'));
@@ -30,6 +31,11 @@ class MessageController extends Controller
 
     public function destroy(Message $message)
     {
+        Log::channel('activity')->info('Message deleted', [
+            'user' => auth()->user()->email ?? 'unknown',
+            'message_id' => $message->id,
+        ]);
+
         $message->delete();
         return back()->with('success', 'Pesan berhasil dihapus.');
     }
@@ -39,7 +45,7 @@ class MessageController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'message' => 'required|string',
+            'message' => 'required|string|max:1000',
         ]);
 
         Message::create($validated);

@@ -6,6 +6,8 @@ use App\Models\Menu;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 
 class HomeController extends Controller
 {
@@ -33,59 +35,63 @@ class HomeController extends Controller
 
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'address' => 'required|string',
+            'phone' => 'required|string|max:20|regex:/^[0-9+\-\s]+$/',
+            'address' => 'required|string|max:500',
             'menu_ids' => 'required|array|min:1',
             'menu_ids.*' => 'exists:menus,id',
             'quantities' => 'required|array|min:1',
-            'quantities.*' => 'integer|min:1',
-            'notes' => 'nullable|string',
+            'quantities.*' => 'integer|min:1|max:99',
+            'notes' => 'nullable|string|max:500',
             'payment_method' => 'required|in:qris,kasir',
         ]);
 
-        $order = Order::create([
-            'customer_name' => $validated['customer_name'],
-            'phone' => $validated['phone'],
-            'address' => $validated['address'],
-            'notes' => $validated['notes'] ?? null,
-            'status' => 'pending',
-            'payment_method' => $validated['payment_method'],
-        ]);
-
-        $totalPrice = 0;
-
-        foreach ($validated['menu_ids'] as $index => $menuId) {
-            $menu = Menu::findOrFail($menuId);
-            $quantity = $validated['quantities'][$index] ?? 1;
-            $subtotal = $menu->price * $quantity;
-            $totalPrice += $subtotal;
-
-            OrderItem::create([
-                'order_id' => $order->id,
-                'menu_id' => $menuId,
-                'quantity' => $quantity,
-                'price' => $menu->price,
+        $order = DB::transaction(function () use ($validated) {
+            $order = Order::create([
+                'customer_name' => e($validated['customer_name']),
+                'phone' => e($validated['phone']),
+                'address' => e($validated['address']),
+                'notes' => $validated['notes'] ? e($validated['notes']) : null,
+                'status' => 'pending',
+                'payment_method' => $validated['payment_method'],
             ]);
-        }
 
-        $order->update(['total_price' => $totalPrice]);
+            $totalPrice = 0;
+
+            foreach ($validated['menu_ids'] as $index => $menuId) {
+                $menu = Menu::findOrFail($menuId);
+                $quantity = $validated['quantities'][$index] ?? 1;
+                $subtotal = $menu->price * $quantity;
+                $totalPrice += $subtotal;
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'menu_id' => $menuId,
+                    'quantity' => $quantity,
+                    'price' => $menu->price,
+                ]);
+            }
+
+            $order->update(['total_price' => $totalPrice]);
+
+            return $order;
+        });
 
         if ($validated['payment_method'] === 'qris') {
-            return redirect()->route('order.qris', $order->id);
+            return redirect()->temporarySignedRoute('order.qris', now()->addMinutes(30), ['order' => $order->id]);
         }
 
-        return redirect()->route('order.struk', $order->id);
+        return redirect()->temporarySignedRoute('order.struk', now()->addMinutes(30), ['order' => $order->id]);
     }
 
-    public function qris($id)
+    public function qris(Order $order)
     {
-        $order = Order::with('items.menu')->findOrFail($id);
+        $order->load('items.menu');
         return view('qris', compact('order'));
     }
 
-    public function struk($id)
+    public function struk(Order $order)
     {
-        $order = Order::with('items.menu')->findOrFail($id);
+        $order->load('items.menu');
         return view('struk', compact('order'));
     }
 }
