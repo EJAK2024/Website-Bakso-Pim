@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
@@ -21,6 +22,10 @@ class AdminController extends Controller
 
     public function login(Request $request)
     {
+        if ($request->input('dummy_email') !== null) {
+            abort(403, 'Akses ditolak.');
+        }
+
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -28,6 +33,12 @@ class AdminController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+
+            if (Auth::user()->two_factor_secret) {
+                $request->session()->put('2fa_user_id', Auth::id());
+                Auth::logout();
+                return redirect('/admin/2fa/verify');
+            }
 
             Log::channel('activity')->info('Login successful', [
                 'user' => $request->email,
@@ -62,14 +73,26 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        $totalMakanan = Menu::where('category', 'makanan')->count();
-        $totalMinuman = Menu::where('category', 'minuman')->count();
-        $totalMenu = Menu::count();
-        $pendingOrders = Order::where('status', 'pending')->count();
-        $unreadOrders = Order::where('is_read', false)->count();
-        $unreadMessages = Message::where('is_read', false)->count();
+        $totalMakanan = Cache::remember('dashboard_total_makanan', 300, function () {
+            return Menu::where('category', 'makanan')->count();
+        });
+        $totalMinuman = Cache::remember('dashboard_total_minuman', 300, function () {
+            return Menu::where('category', 'minuman')->count();
+        });
+        $totalMenu = Cache::remember('dashboard_total_menu', 300, function () {
+            return Menu::count();
+        });
+        $pendingOrders = Cache::remember('dashboard_pending_orders', 60, function () {
+            return Order::where('status', 'pending')->count();
+        });
+        $unreadOrders = Cache::remember('dashboard_unread_orders', 60, function () {
+            return Order::where('is_read', false)->count();
+        });
+        $unreadMessages = Cache::remember('dashboard_unread_messages', 60, function () {
+            return Message::where('is_read', false)->count();
+        });
 
-        return view('admin.index', compact('totalMakanan', 'totalMinuman', 'totalMenu', 'pendingOrders', 'unreadOrders', 'unreadMessages'))
+        return response()->view('admin.index', compact('totalMakanan', 'totalMinuman', 'totalMenu', 'pendingOrders', 'unreadOrders', 'unreadMessages'))
             ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
@@ -78,7 +101,12 @@ class AdminController extends Controller
     public function qrcode()
     {
         $url = url('/');
-        return view('admin.qrcode', compact('url'));
+        $qrCodeSvg = Cache::remember('qrcode_svg', 3600, function () use ($url) {
+            $qr = new \chillerlan\QRCode\QRCode();
+            return $qr->render($url);
+        });
+
+        return view('admin.qrcode', compact('url', 'qrCodeSvg'));
     }
 
     public function registerForm()
@@ -88,6 +116,10 @@ class AdminController extends Controller
 
     public function register(Request $request)
     {
+        if ($request->input('website') !== null) {
+            abort(403, 'Akses ditolak.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',

@@ -24,15 +24,19 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $limiter->for('order', function (Request $request) {
-            return Limit::perMinute(3)->by($request->ip());
+            return Limit::perMinute(20)->by($request->ip());
         });
 
         $limiter->for('contact', function (Request $request) {
-            return Limit::perMinute(3)->by($request->ip());
+            return Limit::perMinute(20)->by($request->ip());
         });
 
         $limiter->for('register', function (Request $request) {
-            return Limit::perMinute(2)->by($request->ip());
+            return Limit::perMinute(10)->by($request->ip());
+        });
+
+        $limiter->for('upload-proof', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
         });
     }
 }

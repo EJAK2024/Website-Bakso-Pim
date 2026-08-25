@@ -24,7 +24,7 @@
                     <div id="qr-print-area" class="flex justify-center mb-6">
                         <div class="bg-white p-4 rounded-xl border-2 border-gray-100 shadow-inner">
                             <img
-                                src="https://api.qrserver.com/v1/create-qr-code/size=400x400/?data={{ urlencode($url) }}"
+                                src="{{ $qrCodeSvg }}"
                                 alt="QR Code Bakso Pim"
                                 class="w-64 h-64 sm:w-72 sm:h-72 object-contain"
                                 id="qrImage"
@@ -66,8 +66,8 @@
 <script>
     function downloadQR() {
         const link = document.createElement('a');
-        link.href = 'https://api.qrserver.com/v1/create-qr-code/size=400x400/?data={{ urlencode($url) }}';
-        link.download = 'QR-Code-Bakso-Pim.png';
+        link.href = '{{ $qrCodeSvg }}';
+        link.download = 'QR-Code-Bakso-Pim.svg';
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();

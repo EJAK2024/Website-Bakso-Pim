@@ -126,6 +126,27 @@
                             <p class="text-sm text-gray-500">Lihat bukti pembayaran pelanggan</p>
                         </div>
                     </a>
+                    @if(!Auth::user()->two_factor_secret)
+                        <a href="{{ route('2fa.setup') }}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]">
+                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-shield-alt text-red-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">Aktifkan 2FA</p>
+                                <p class="text-sm text-gray-500">Keamanan ekstra untuk akun Anda</p>
+                            </div>
+                        </a>
+                    @else
+                        <div class="flex items-center p-4 border border-green-200 rounded-lg bg-green-50">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-shield-alt text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-green-800">2FA Aktif</p>
+                                <p class="text-sm text-green-600">Akun Anda sudah terlindungi</p>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

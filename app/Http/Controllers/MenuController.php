@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class MenuController extends Controller
@@ -39,6 +40,12 @@ class MenuController extends Controller
         }
 
         Menu::create($validated);
+
+        Cache::forget('menu_makanan');
+        Cache::forget('menu_minuman');
+        Cache::forget('dashboard_total_makanan');
+        Cache::forget('dashboard_total_minuman');
+        Cache::forget('dashboard_total_menu');
 
         Log::channel('activity')->info('Menu created', [
             'user' => auth()->user()->email ?? 'unknown',
@@ -77,6 +84,12 @@ class MenuController extends Controller
 
         $menu->update($validated);
 
+        Cache::forget('menu_makanan');
+        Cache::forget('menu_minuman');
+        Cache::forget('dashboard_total_makanan');
+        Cache::forget('dashboard_total_minuman');
+        Cache::forget('dashboard_total_menu');
+
         Log::channel('activity')->info('Menu updated', [
             'user' => auth()->user()->email ?? 'unknown',
             'menu_id' => $menu->id,
@@ -96,6 +109,13 @@ class MenuController extends Controller
             \Storage::disk('public')->delete($menu->image);
         }
         $menu->delete();
+
+        Cache::forget('menu_makanan');
+        Cache::forget('menu_minuman');
+        Cache::forget('dashboard_total_makanan');
+        Cache::forget('dashboard_total_minuman');
+        Cache::forget('dashboard_total_menu');
+
         return redirect('/admin/menu')->with('success', 'Menu berhasil dihapus.');
     }
 }

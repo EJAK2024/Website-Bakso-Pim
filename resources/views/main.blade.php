@@ -172,6 +172,9 @@
                     <form method="POST" action="{{ route('kontak.submit') }}" class="bg-white p-5 sm:p-6 rounded-lg shadow-md">
                         @csrf
                         <h3 class="text-xl font-bold mb-4">Kirim Pesan</h3>
+                        <div class="absolute -left-[9999px]" aria-hidden="true">
+                            <input type="text" name="website" tabindex="-1" autocomplete="off">
+                        </div>
                         <div class="mb-4">
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
                             <input type="text" name="name" id="name" value="{{ old('name') }}" placeholder="Masukkan nama Anda" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">

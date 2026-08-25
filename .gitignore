@@ -1,6 +1,16 @@
 *.log
 .DS_Store
 .env
+.gitignore
+Dockerfile
+RINGAKASAN_HARI_INI.md
+.dockerignore
+.editorconfig
+.phpunit.result.cache
+artisan
+railway.json
+vite.config.js
+ANALISIS_SISTEM.md
 AGENTS.Md
 .env.backup
 .env.production

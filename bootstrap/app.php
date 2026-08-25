@@ -6,6 +6,8 @@ use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\PreventSpam;
 use App\Http\Middleware\AdminActivity;
+use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\EnsureTwoFactorVerified;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'spam' => PreventSpam::class,
             'activity' => AdminActivity::class,
+            'admin' => EnsureUserIsAdmin::class,
+            '2fa' => EnsureTwoFactorVerified::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

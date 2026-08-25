@@ -43,6 +43,10 @@
                 <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-green-700 transition-all duration-150 active:scale-95 shadow-lg">
                     &#128274; Login Admin
                 </button>
+
+                <div class="mt-4 text-center">
+                    <a href="/forgot-password" class="text-sm text-green-600 hover:text-green-800 font-medium">Lupa Password?</a>
+                </div>
             </form>
         </div>
     </section>

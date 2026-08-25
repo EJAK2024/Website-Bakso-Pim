@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessPaymentVerification;
+use App\Jobs\SendOrderNotification;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 
@@ -13,22 +16,34 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $makanan = Menu::where('category', 'makanan')->where('is_available', true)->get();
-        $minuman = Menu::where('category', 'minuman')->where('is_available', true)->get();
+        $makanan = Cache::remember('menu_makanan', 300, function () {
+            return Menu::where('category', 'makanan')->where('is_available', true)->get();
+        });
+        $minuman = Cache::remember('menu_minuman', 300, function () {
+            return Menu::where('category', 'minuman')->where('is_available', true)->get();
+        });
 
         return view('main', compact('makanan', 'minuman'));
     }
 
     public function pesan()
     {
-        $makanan = Menu::where('category', 'makanan')->where('is_available', true)->get();
-        $minuman = Menu::where('category', 'minuman')->where('is_available', true)->get();
+        $makanan = Cache::remember('menu_makanan', 300, function () {
+            return Menu::where('category', 'makanan')->where('is_available', true)->get();
+        });
+        $minuman = Cache::remember('menu_minuman', 300, function () {
+            return Menu::where('category', 'minuman')->where('is_available', true)->get();
+        });
 
         return view('pesan', compact('makanan', 'minuman'));
     }
 
     public function submitOrder(Request $request)
     {
+        if ($request->input('website') !== null) {
+            abort(403, 'Akses ditolak.');
+        }
+
         if (!Order::isOperationalHours()) {
             return redirect()->route('pesan')->withErrors(['order' => 'Toko sedang tutup. Jam operasional: 10:00 - 23:00 WIB.']);
         }
@@ -45,6 +60,10 @@ class HomeController extends Controller
             'payment_method' => 'required|in:qris,kasir',
         ]);
 
+        $validated['customer_name'] = strip_tags($validated['customer_name']);
+        $validated['address'] = strip_tags($validated['address']);
+        $validated['notes'] = isset($validated['notes']) ? strip_tags($validated['notes']) : null;
+
         $order = DB::transaction(function () use ($validated) {
             $order = Order::create([
                 'customer_name' => $validated['customer_name'],
@@ -57,8 +76,13 @@ class HomeController extends Controller
 
             $totalPrice = 0;
 
+            $menus = Menu::whereIn('id', $validated['menu_ids'])->get()->keyBy('id');
+
             foreach ($validated['menu_ids'] as $index => $menuId) {
-                $menu = Menu::findOrFail($menuId);
+                $menu = $menus->get($menuId);
+                if (!$menu) {
+                    abort(422, 'Menu tidak ditemukan.');
+                }
                 $quantity = $validated['quantities'][$index] ?? 1;
                 $subtotal = $menu->price * $quantity;
                 $totalPrice += $subtotal;
@@ -75,6 +99,11 @@ class HomeController extends Controller
 
             return $order;
         });
+
+        Cache::forget('dashboard_pending_orders');
+
+        SendOrderNotification::dispatch($order);
+        ProcessPaymentVerification::dispatch($order);
 
         if ($validated['payment_method'] === 'qris') {
             return redirect()->temporarySignedRoute('order.qris', now()->addMinutes(30), ['order' => $order->id]);

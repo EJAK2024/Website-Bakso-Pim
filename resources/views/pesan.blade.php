@@ -37,6 +37,9 @@
 
             <form method="POST" action="{{ route('order.submit') }}" class="bg-white rounded-xl shadow-lg p-5 sm:p-8 {{ !\App\Models\Order::isOperationalHours() ? 'opacity-50 pointer-events-none' : '' }}">
                 @csrf
+                <div class="absolute -left-[9999px]" aria-hidden="true">
+                    <input type="text" name="website" tabindex="-1" autocomplete="off">
+                </div>
 
                 <div class="mb-6">
                     <label for="customer_name" class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap</label>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
@@ -11,7 +12,9 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::with('items.menu')->latest()->paginate(20);
-        $unreadCount = Order::where('is_read', false)->count();
+        $unreadCount = Cache::remember('dashboard_unread_orders', 60, function () {
+            return Order::where('is_read', false)->count();
+        });
 
         return view('admin.orders.index', compact('orders', 'unreadCount'));
     }
@@ -19,6 +22,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $order->update(['is_read' => true]);
+        Cache::forget('dashboard_unread_orders');
         $order->load('items.menu');
 
         return view('admin.orders.show', compact('order'));
@@ -33,6 +37,10 @@ class OrderController extends Controller
         $oldStatus = $order->status;
         $order->update($validated);
 
+        if ($validated['status'] === 'pending') {
+            Cache::forget('dashboard_pending_orders');
+        }
+
         Log::channel('activity')->info('Order status updated', [
             'user' => auth()->user()->email ?? 'unknown',
             'order_id' => $order->id,
@@ -46,6 +54,7 @@ class OrderController extends Controller
     public function markAllRead()
     {
         Order::where('is_read', false)->update(['is_read' => true]);
+        Cache::forget('dashboard_unread_orders');
         return redirect('/admin')->with('success', 'Semua pesanan ditandai sudah dibaca.');
     }
 

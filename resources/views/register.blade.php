@@ -22,6 +22,9 @@
 
             <form method="POST" action="/register" class="bg-white rounded-xl shadow-lg p-8">
                 @csrf
+                <div class="absolute -left-[9999px]" aria-hidden="true">
+                    <input type="text" name="website" tabindex="-1" autocomplete="off">
+                </div>
 
                 <div class="mb-5">
                     <label for="name" class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap</label>

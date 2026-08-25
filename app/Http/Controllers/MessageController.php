@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class MessageController extends Controller
@@ -11,7 +12,9 @@ class MessageController extends Controller
     public function index()
     {
         $messages = Message::latest()->paginate(20);
-        $unreadCount = Message::where('is_read', false)->count();
+        $unreadCount = Cache::remember('dashboard_unread_messages', 60, function () {
+            return Message::where('is_read', false)->count();
+        });
 
         return view('admin.messages.index', compact('messages', 'unreadCount'));
     }
@@ -19,6 +22,7 @@ class MessageController extends Controller
     public function show(Message $message)
     {
         $message->update(['is_read' => true]);
+        Cache::forget('dashboard_unread_messages');
 
         return view('admin.messages.show', compact('message'));
     }
@@ -26,6 +30,7 @@ class MessageController extends Controller
     public function markAllRead()
     {
         Message::where('is_read', false)->update(['is_read' => true]);
+        Cache::forget('dashboard_unread_messages');
         return redirect('/admin')->with('success', 'Semua pesan ditandai sudah dibaca.');
     }
 
@@ -42,11 +47,18 @@ class MessageController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->input('website') !== null) {
+            abort(403, 'Akses ditolak.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'message' => 'required|string|max:1000',
         ]);
+
+        $validated['name'] = strip_tags($validated['name']);
+        $validated['message'] = strip_tags($validated['message']);
 
         Message::create($validated);
 
