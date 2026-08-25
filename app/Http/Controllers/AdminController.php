@@ -69,7 +69,10 @@ class AdminController extends Controller
         $unreadOrders = Order::where('is_read', false)->count();
         $unreadMessages = Message::where('is_read', false)->count();
 
-        return view('admin.index', compact('totalMakanan', 'totalMinuman', 'totalMenu', 'pendingOrders', 'unreadOrders', 'unreadMessages'));
+        return view('admin.index', compact('totalMakanan', 'totalMinuman', 'totalMenu', 'pendingOrders', 'unreadOrders', 'unreadMessages'))
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
     public function qrcode()

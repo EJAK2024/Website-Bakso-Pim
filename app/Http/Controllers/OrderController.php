@@ -46,6 +46,16 @@ class OrderController extends Controller
     public function markAllRead()
     {
         Order::where('is_read', false)->update(['is_read' => true]);
-        return back()->with('success', 'Semua pesanan ditandai sudah dibaca.');
+        return redirect('/admin')->with('success', 'Semua pesanan ditandai sudah dibaca.');
+    }
+
+    public function paymentProofs()
+    {
+        $orders = Order::where('payment_method', 'qris')
+            ->whereNotNull('payment_proof')
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.orders.payment-proofs', compact('orders'));
     }
 }

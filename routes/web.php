@@ -12,7 +12,7 @@ Route::get('/', [HomeController::class, 'index']);
 Route::post('/kontak', [MessageController::class, 'store'])
     ->middleware('throttle:contact')
     ->name('kontak.submit');
-Route::get('/pesan', [HomeController::class, 'pesan']);
+Route::get('/pesan', [HomeController::class, 'pesan'])->name('pesan');
 Route::post('/pesan', [HomeController::class, 'submitOrder'])
     ->middleware('throttle:order')
     ->name('order.submit');
@@ -22,6 +22,8 @@ Route::get('/pesan/{order}/qris', [HomeController::class, 'qris'])
 Route::get('/pesan/{order}/struk', [HomeController::class, 'struk'])
     ->middleware('signed')
     ->name('order.struk');
+Route::put('/pesan/{order}/upload-proof', [HomeController::class, 'uploadProof'])
+    ->name('order.uploadProof');
 
 Route::get('/login', [AdminController::class, 'loginForm'])->name('login');
 Route::post('/login', [AdminController::class, 'login'])
@@ -35,6 +37,7 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:register');
 
     Route::get('/admin/qrcode', [AdminController::class, 'qrcode'])->name('admin.qrcode');
+    Route::get('/admin/payment-proofs', [OrderController::class, 'paymentProofs'])->name('orders.paymentProofs');
 
     Route::prefix('admin/menu')->name('menu.')->middleware('activity')->group(function () {
         Route::get('/', [MenuController::class, 'index'])->name('index');

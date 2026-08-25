@@ -38,9 +38,41 @@
                     </ol>
                 </div>
 
-                <a href="{{ route('order.struk', $order->id) }}" class="block w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition-all duration-150 active:scale-95 shadow-lg no-print">
-                    &#10004; Sudah Bayar
-                </a>
+                @if($errors->any())
+                    <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-left">
+                        @foreach($errors->all() as $error)
+                            <p class="text-red-600 text-sm">{{ $error }}</p>
+                        @endforeach
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('order.uploadProof', $order->id) }}" enctype="multipart/form-data" id="paymentForm">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="mb-4 text-left">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Upload Bukti Pembayaran <span class="text-red-500">*</span></label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-green-400 transition-colors cursor-pointer" id="dropZone" onclick="document.getElementById('payment_proof').click()">
+                            <input type="file" name="payment_proof" id="payment_proof" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="previewImage(this)">
+                            <div id="uploadPlaceholder">
+                                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <span class="text-gray-400 text-2xl">&#128247;</span>
+                                </div>
+                                <p class="text-sm text-gray-500">Klik untuk upload gambar</p>
+                                <p class="text-xs text-gray-400 mt-1">JPG, PNG, atau WebP (Maks. 2MB)</p>
+                            </div>
+                            <div id="imagePreview" class="hidden">
+                                <img id="previewImg" class="max-h-48 mx-auto rounded-lg mb-2">
+                                <p id="fileName" class="text-sm text-gray-600 truncate"></p>
+                                <button type="button" onclick="removeImage(event)" class="mt-2 text-sm text-red-500 hover:text-red-700 font-semibold">Hapus Gambar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" onclick="return validateUpload()" class="block w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition-all duration-150 active:scale-95 shadow-lg no-print">
+                        &#10004; Sudah Bayar
+                    </button>
+                </form>
             </div>
         </div>
     </section>
@@ -53,4 +85,44 @@
         body { background: white !important; }
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Ukuran gambar maksimal 2MB!');
+                input.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('uploadPlaceholder').classList.add('hidden');
+                document.getElementById('imagePreview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function removeImage(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.getElementById('payment_proof').value = '';
+        document.getElementById('uploadPlaceholder').classList.remove('hidden');
+        document.getElementById('imagePreview').classList.add('hidden');
+    }
+
+    function validateUpload() {
+        const input = document.getElementById('payment_proof');
+        if (!input.files || !input.files[0]) {
+            alert('Mohon upload bukti pembayaran terlebih dahulu!');
+            return false;
+        }
+        return true;
+    }
+</script>
 @endpush

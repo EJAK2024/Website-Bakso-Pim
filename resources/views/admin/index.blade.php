@@ -117,6 +117,15 @@
                             <p class="text-sm text-gray-500">Generate QR untuk ditaruh di meja</p>
                         </div>
                     </a>
+                    <a href="{{ route('orders.paymentProofs') }}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all duration-150 active:scale-[1.02]">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                            <i class="fas fa-image text-blue-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-800">Bukti Bayar QRIS</p>
+                            <p class="text-sm text-gray-500">Lihat bukti pembayaran pelanggan</p>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>

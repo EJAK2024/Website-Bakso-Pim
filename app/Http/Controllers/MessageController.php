@@ -26,7 +26,7 @@ class MessageController extends Controller
     public function markAllRead()
     {
         Message::where('is_read', false)->update(['is_read' => true]);
-        return back()->with('success', 'Semua pesan ditandai sudah dibaca.');
+        return redirect('/admin')->with('success', 'Semua pesan ditandai sudah dibaca.');
     }
 
     public function destroy(Message $message)

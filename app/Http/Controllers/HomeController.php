@@ -35,7 +35,7 @@ class HomeController extends Controller
 
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20|regex:/^[0-9+\-\s]+$/',
+            'phone' => 'required|string|max:20|regex:/^[0-9]+$/',
             'address' => 'required|string|max:500',
             'menu_ids' => 'required|array|min:1',
             'menu_ids.*' => 'exists:menus,id',
@@ -47,10 +47,10 @@ class HomeController extends Controller
 
         $order = DB::transaction(function () use ($validated) {
             $order = Order::create([
-                'customer_name' => e($validated['customer_name']),
-                'phone' => e($validated['phone']),
-                'address' => e($validated['address']),
-                'notes' => $validated['notes'] ? e($validated['notes']) : null,
+                'customer_name' => $validated['customer_name'],
+                'phone' => $validated['phone'],
+                'address' => $validated['address'],
+                'notes' => $validated['notes'] ?? null,
                 'status' => 'pending',
                 'payment_method' => $validated['payment_method'],
             ]);
@@ -93,5 +93,17 @@ class HomeController extends Controller
     {
         $order->load('items.menu');
         return view('struk', compact('order'));
+    }
+
+    public function uploadProof(Request $request, Order $order)
+    {
+        $request->validate([
+            'payment_proof' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        $path = $request->file('payment_proof')->store('payment-proofs', 'public');
+        $order->update(['payment_proof' => $path]);
+
+        return redirect()->temporarySignedRoute('order.struk', now()->addMinutes(30), ['order' => $order->id]);
     }
 }

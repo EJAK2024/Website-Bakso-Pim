@@ -3,7 +3,12 @@
 @section('content')
     <section class="flex-1 py-6 sm:py-10">
         <div class="container mx-auto px-4 max-w-2xl">
-            <h1 class="text-2xl sm:text-3xl font-bold text-green-700 mb-2">Detail Pesan</h1>
+            <div class="flex items-center gap-3 mb-2">
+                <a href="{{ route('messages.index') }}" class="bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-300 transition-all duration-150 active:scale-95">
+                    <i class="fas fa-arrow-left mr-1"></i>Kembali
+                </a>
+                <h1 class="text-2xl sm:text-3xl font-bold text-green-700">Detail Pesan</h1>
+            </div>
             <p class="text-gray-500 mb-6 sm:mb-8">{{ $message->created_at->format('d M Y, H:i') }}</p>
 
             <div class="bg-white rounded-xl shadow-lg p-5 sm:p-6 mb-6">

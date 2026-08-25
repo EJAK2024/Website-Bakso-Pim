@@ -31,10 +31,6 @@ class MenuController extends Controller
         ]);
 
         $validated['is_available'] = $request->boolean('is_available');
-        $validated['name'] = e($validated['name']);
-        if (isset($validated['description'])) {
-            $validated['description'] = e($validated['description']);
-        }
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('menu', 'public');
@@ -69,10 +65,6 @@ class MenuController extends Controller
         ]);
 
         $validated['is_available'] = $request->boolean('is_available');
-        $validated['name'] = e($validated['name']);
-        if (isset($validated['description'])) {
-            $validated['description'] = e($validated['description']);
-        }
 
         if ($request->hasFile('image')) {
             if ($menu->image && \Storage::disk('public')->exists($menu->image)) {

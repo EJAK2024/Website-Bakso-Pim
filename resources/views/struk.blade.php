@@ -91,7 +91,7 @@
                         <div class="flex items-center justify-between bg-gradient-to-r from-green-600 to-green-700 rounded-xl p-3 text-white">
                             <div class="flex items-center">
                                 <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center mr-3">
-                                    <span class="text-white">{{ $order->payment_method === 'qris' ? '&#9641;' : '&#127978;' }}</span>
+                                    <span class="text-white">{!! $order->payment_method === 'qris' ? '&#9641;' : '&#127978;' !!}</span>
                                 </div>
                                 <div>
                                     <p class="text-[10px] text-green-200 uppercase">Metode Pembayaran</p>

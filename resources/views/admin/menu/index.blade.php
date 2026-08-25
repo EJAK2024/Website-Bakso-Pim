@@ -4,9 +4,14 @@
     <section class="flex-1 py-10">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h1 class="text-3xl font-bold text-green-700">Kelola Menu</h1>
-                    <p class="text-gray-500">Tambah, ubah, atau hapus menu makanan & minuman</p>
+                <div class="flex items-center gap-3">
+                    <a href="/admin" class="bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-300 transition-all duration-150 active:scale-95">
+                        <i class="fas fa-arrow-left mr-1"></i>Kembali
+                    </a>
+                    <div>
+                        <h1 class="text-3xl font-bold text-green-700">Kelola Menu</h1>
+                        <p class="text-gray-500">Tambah, ubah, atau hapus menu makanan & minuman</p>
+                    </div>
                 </div>
                 <a href="{{ route('menu.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-all duration-150 active:scale-95 shadow-lg">
                     <i class="fas fa-plus mr-2"></i>Tambah Menu

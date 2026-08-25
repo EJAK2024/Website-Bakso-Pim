@@ -45,7 +45,7 @@
 
                 <div class="mb-6">
                     <label for="phone" class="block text-sm font-semibold text-gray-700 mb-1">No. HP / Telepon</label>
-                    <input type="tel" name="phone" id="phone" value="{{ old('phone') }}" placeholder="Contoh: 0812-3456-7890" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
+                    <input type="tel" name="phone" id="phone" value="{{ old('phone') }}" placeholder="Contoh: 081234567890" inputmode="numeric" pattern="[0-9]*" onkeypress="return /\d/.test(String.fromCharCode(event.keyCode || event.which))" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
                 </div>
 
                 <div class="mb-6">
@@ -274,6 +274,7 @@
 
     function submitOrder() {
         closeConfirm();
+        document.querySelectorAll('.qty-input.hidden').forEach(input => input.disabled = true);
         document.getElementById('loadingOverlay').classList.add('active');
         document.querySelector('form').submit();
     }
